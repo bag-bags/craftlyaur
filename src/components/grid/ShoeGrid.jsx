@@ -18,6 +18,7 @@ import { Rig } from "./Rig";
 import { GridCanvas } from "./GridCanvas";
 import { UnifiedControlBar } from "../GridUI";
 import Header from "../Header";
+import ContactModal from "../ContactModal";
 import { TopologyBackground } from "../TopologyBackground";
 import "../HoloCardMaterial"; // Registers <holoCardMaterial /> with R3F
 
@@ -29,6 +30,7 @@ shoes.forEach((shoe) => {
 
 // --- MAIN EXPORT ---
 export default function ShoeGrid() {
+    const [isContactOpen, setIsContactOpen] = useState(false);
     const [zoomTarget, setZoomTarget] = useState(null);
     const [initialZoom] = useState(DEFAULT_CONFIG.zoomOut);
     const [currentZoom, setCurrentZoom] = useState(
@@ -187,7 +189,8 @@ export default function ShoeGrid() {
             }}
         >
             <Leva collapsed={true} hidden={false} />
-            <Header />
+            <Header onContactClick={() => setIsContactOpen(true)} />
+            <ContactModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
             <Canvas
                 camera={{ position: [0, 0, initialZoom], fov: 45 }}
                 dpr={[1, 2]}

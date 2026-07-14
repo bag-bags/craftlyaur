@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function Header() {
+export default function Header({ onContactClick }) {
   return (
     <header
       className="site-header"
@@ -97,6 +97,7 @@ export default function Header() {
       >
         <NavItem label="BROWSE" number="01" />
         <NavItem label="COLLECT" number="02" />
+        <NavItem label="CONTACT" number="03" onClick={onContactClick} />
         <Divider />
         <QuoteText text="HANDMADE" />
       </div>
@@ -116,9 +117,10 @@ export default function Header() {
   );
 }
 
-function NavItem({ label, number }) {
+function NavItem({ label, number, onClick }) {
   return (
     <div
+      onClick={onClick}
       style={{
         display: "flex",
         alignItems: "baseline",
