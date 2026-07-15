@@ -21,7 +21,7 @@ function main() {
   const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
   console.log(`Loaded ${rows.length} rows from XLSX Products sheet`);
 
-  // 3. Build a map: product_name -> { description, galleryImages[] }
+  // 3. Build a map: product_name -> { description, galleryImages[], productToken }
   const xlsxMap = {};
   for (let i = 3; i < rows.length; i++) {
     const row = rows[i];
@@ -31,6 +31,7 @@ function main() {
     if (!xlsxMap[name]) {
       xlsxMap[name] = {
         description: (row[5] || "").trim(),
+        productToken: (row[3] || "").toString().trim(),
         galleryImages: new Set(),
       };
     }
@@ -51,6 +52,10 @@ function main() {
 
     if (xlsxData) {
       bag.description = xlsxData.description;
+      // Build proper faire.com product URL from token
+      if (xlsxData.productToken) {
+        bag.product_url = `https://www.faire.com/product/${xlsxData.productToken}`;
+      }
       // Gallery = all option images EXCEPT the main image_url (avoid duplicates)
       const mainUrl = bag.image_url;
       const galleryUrls = [...xlsxData.galleryImages].filter(
@@ -76,6 +81,9 @@ function main() {
   );
   console.log(
     `  With gallery images: ${bags.filter((b) => b.gallery.length > 0).length}`
+  );
+  console.log(
+    `  With product URLs: ${bags.filter((b) => b.product_url.includes("/product/p_")).length}`
   );
 }
 
