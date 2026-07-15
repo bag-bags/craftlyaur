@@ -44,15 +44,11 @@ export default function ShoeGrid() {
         }, 50); // Update every 50ms
         return () => clearInterval(interval);
     }, []);
-    // Track active selection state
+    // Track active selection state and active product data
     const [hasActiveSelection, setHasActiveSelection] =
         useState(false);
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setHasActiveSelection(rigState.activeId !== null);
-        }, 16); // Update every frame (60fps) for smoother updates
-        return () => clearInterval(interval);
-    }, []);
+    const [activeProductData, setActiveProductData] =
+        useState(null);
     const isZoomedIn = currentZoom <= CONFIG.zoomIn + 0.5;
 
     // Responsive zoom for mobile viewports
@@ -104,6 +100,23 @@ export default function ShoeGrid() {
     ]);
     const [activeCollectionIdx, setActiveCollectionIdx] =
         useState(0);
+    // Track active product data (must be after gridLayers declaration)
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const isActive = rigState.activeId !== null;
+            setHasActiveSelection(isActive);
+            if (isActive) {
+                // Find the active product from the current active layer
+                const currentItems = gridLayers[gridLayers.length - 1]?.items;
+                if (currentItems && rigState.activeId < currentItems.length) {
+                    setActiveProductData(currentItems[rigState.activeId]);
+                }
+            } else {
+                setActiveProductData(null);
+            }
+        }, 16);
+        return () => clearInterval(interval);
+    }, [gridLayers]);
     const handleCollectionSwitch = (index) => {
         if (index === activeCollectionIdx) return;
         const now = Date.now();
@@ -258,6 +271,7 @@ export default function ShoeGrid() {
                 setZoomTrigger={setZoomTarget}
                 isZoomedIn={isZoomedIn}
                 hasActiveSelection={hasActiveSelection}
+                activeProductData={activeProductData}
                 nikeFilter={nikeFilter}
                 onFilterChange={handleFilterChange}
             />
