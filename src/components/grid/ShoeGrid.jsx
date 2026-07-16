@@ -79,12 +79,13 @@ export default function ShoeGrid() {
     const [nikeFilter, setNikeFilter] = useState("all"); // 'all' | 'sandals' | 'slippers'
     const [colorFilter, setColorFilter] = useState(EMPTY_COLORS); // [] = all, ['blue','green'] = blue OR green
 
-    // Collections - Footwear, Bags & Backpacks, Baskets & Decor
+    // Collections - Footwear, Bags & Backpacks, Baskets & Decor, All
     const collectionsData = useMemo(() => {
         const footwear = shoes.filter((s) => s.brand === "Moroccan Footwear");
         const bags = shoes.filter((s) => s.brand === "Moroccan Bags");
         const decor = shoes.filter((s) => s.brand === "Moroccan Home");
-        return [footwear, bags, decor];
+        const all = [...shoes]; // All products
+        return [footwear, bags, decor, all];
     }, []);
     // --- Grid Stack State ---
     // Instead of one list of items, we keep a stack of "Rendered Layers".
@@ -202,7 +203,12 @@ export default function ShoeGrid() {
             }}
         >
             <Leva collapsed={true} hidden={false} />
-            <Header onContactClick={() => setIsContactOpen(true)} />
+            <Header
+                onContactClick={() => setIsContactOpen(true)}
+                collectionsData={collectionsData}
+                activeCollectionIdx={activeCollectionIdx}
+                onCollectionSwitch={handleCollectionSwitch}
+            />
             <ContactModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
             <Canvas
                 camera={{ position: [0, 0, initialZoom], fov: 45 }}

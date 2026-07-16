@@ -24,6 +24,7 @@ export function UnifiedControlBar({
     "Footwear",
     "Bags & Backpacks",
     "Baskets & Decor",
+    "All Products",
   ];
 
   const nikeFilters = [
