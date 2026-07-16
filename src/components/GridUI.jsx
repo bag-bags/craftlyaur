@@ -36,6 +36,7 @@ export function UnifiedControlBar({
   // Hover state for popovers
   const [showDescription, setShowDescription] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
+  const [hoveredGalleryIdx, setHoveredGalleryIdx] = useState(0);
   const descTimeoutRef = useRef(null);
   const galleryTimeoutRef = useRef(null);
 
@@ -44,6 +45,7 @@ export function UnifiedControlBar({
     if (!hasActiveSelection) {
       setShowDescription(false);
       setShowGallery(false);
+      setHoveredGalleryIdx(0);
     }
   }, [hasActiveSelection]);
 
@@ -141,20 +143,70 @@ export function UnifiedControlBar({
               width: "90vw",
               marginBottom: "12px",
               padding: "12px",
-              background: "linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(250, 245, 255, 0.85) 100%)",
+              background: "linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(250, 248, 255, 0.9) 100%)",
               backdropFilter: "blur(40px) saturate(200%)",
               WebkitBackdropFilter: "blur(40px) saturate(200%)",
               borderRadius: "20px",
               border: "1px solid rgba(255, 255, 255, 0.4)",
-              boxShadow: "0 12px 40px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.6)",
+              boxShadow: "0 12px 48px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.6)",
               pointerEvents: "auto",
+              display: "flex",
+              flexDirection: "column",
+              gap: "10px",
             }}
           >
+            {/* Zoomed preview */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={hoveredGalleryIdx}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                style={{
+                  width: "100%",
+                  height: "300px",
+                  borderRadius: "14px",
+                  overflow: "hidden",
+                  background: "#f0f0f0",
+                  position: "relative",
+                }}
+              >
+                <img
+                  src={activeProductData.gallery[hoveredGalleryIdx] || activeProductData.gallery[0]}
+                  alt={`${activeProductData.title} - zoomed view`}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                    display: "block",
+                  }}
+                />
+                {/* Image counter */}
+                <div style={{
+                  position: "absolute",
+                  bottom: "8px",
+                  right: "10px",
+                  background: "rgba(0,0,0,0.55)",
+                  color: "#fff",
+                  fontSize: "10px",
+                  fontWeight: "500",
+                  padding: "3px 8px",
+                  borderRadius: "8px",
+                  fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                  letterSpacing: "0.02em",
+                }}>
+                  {hoveredGalleryIdx + 1} / {activeProductData.gallery.length}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Thumbnail strip */}
             <div style={{
               display: "flex",
-              gap: "8px",
+              gap: "6px",
               overflowX: "auto",
-              padding: "4px 0",
+              padding: "2px 0",
               scrollbarWidth: "none",
             }}>
               {activeProductData.gallery.map((url, idx) => (
@@ -162,25 +214,32 @@ export function UnifiedControlBar({
                   key={idx}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: idx * 0.05 }}
+                  transition={{ delay: idx * 0.03 }}
+                  onMouseEnter={() => setHoveredGalleryIdx(idx)}
                   style={{
                     flexShrink: 0,
-                    width: "120px",
-                    height: "120px",
-                    borderRadius: "12px",
+                    width: "56px",
+                    height: "56px",
+                    borderRadius: "8px",
                     overflow: "hidden",
-                    border: "1px solid rgba(0,0,0,0.06)",
+                    cursor: "pointer",
                     background: "#f5f5f5",
+                    border: hoveredGalleryIdx === idx
+                      ? "2px solid rgba(0,0,0,0.8)"
+                      : "2px solid transparent",
+                    opacity: hoveredGalleryIdx === idx ? 1 : 0.6,
+                    transition: "border 0.15s ease, opacity 0.15s ease",
                   }}
                 >
                   <img
                     src={url}
-                    alt={`${activeProductData.title} - view ${idx + 1}`}
+                    alt={`${activeProductData.title} - thumb ${idx + 1}`}
                     loading="lazy"
                     style={{
                       width: "100%",
                       height: "100%",
                       objectFit: "cover",
+                      display: "block",
                     }}
                   />
                 </motion.div>
