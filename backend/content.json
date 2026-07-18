@@ -1,0 +1,32 @@
+{
+  "header": {
+    "brandName": "MOROCCAN",
+    "brandSuffix": "CRAFTS",
+    "tagline": "Est. 2026",
+    "quoteText": "HANDMADE"
+  },
+  "buttons": {
+    "buyNow": "Buy Now",
+    "description": "Description",
+    "gallery": "Gallery",
+    "contact": "Contact Us"
+  },
+  "collections": [
+    { "name": "Footwear", "brand": "Moroccan Footwear" },
+    { "name": "Bags & Backpacks", "brand": "Moroccan Bags" },
+    { "name": "Baskets & Decor", "brand": "Moroccan Home" },
+    { "name": "All Products", "brand": "all" }
+  ],
+  "footer": {
+    "copyright": "© 2026 Moroccan Crafts. All rights reserved.",
+    "links": [
+      { "label": "About", "url": "#" },
+      { "label": "Shipping", "url": "#" },
+      { "label": "Returns", "url": "#" }
+    ]
+  },
+  "stripe": {
+    "enabled": false,
+    "currency": "usd"
+  }
+}
