@@ -20,12 +20,40 @@ export function UnifiedControlBar({
   nikeFilter,
   onFilterChange,
 }) {
-  const collections = [
-    "Footwear",
-    "Bags & Backpacks",
-    "Baskets & Decor",
-    "All Products",
-  ];
+  const [cmsConfig, setCmsConfig] = useState({
+    buttons: {
+      buyNow: "Buy Now",
+      description: "Description",
+      gallery: "Gallery",
+      contact: "Contact Us"
+    },
+    collections: [
+      { name: "Footwear" },
+      { name: "Bags & Backpacks" },
+      { name: "Baskets & Decor" },
+      { name: "All Products" }
+    ],
+    stripe: {
+      enabled: false,
+      currency: "usd"
+    }
+  });
+
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+
+  // Fetch CMS Configs
+  useEffect(() => {
+    fetch("/api/admin/content")
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.buttons) {
+          setCmsConfig(data);
+        }
+      })
+      .catch(err => console.error("CMS load error:", err));
+  }, []);
+
+  const collections = cmsConfig.collections.map(c => c.name);
 
   const nikeFilters = [
     { id: "all", label: "All" },
@@ -48,6 +76,41 @@ export function UnifiedControlBar({
       setHoveredGalleryIdx(0);
     }
   }, [hasActiveSelection]);
+
+  const handleBuyNowClick = async () => {
+    if (!activeProductData) return;
+
+    if (cmsConfig.stripe.enabled) {
+      setCheckoutLoading(true);
+      try {
+        const res = await fetch("/api/checkout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: activeProductData.title,
+            price: activeProductData.price,
+            image: activeProductData.image_url
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to start checkout");
+
+        // Redirect to Stripe checkout
+        window.location.href = data.url;
+      } catch (err) {
+        alert("Payment Error: " + err.message);
+        setCheckoutLoading(false);
+      }
+    } else {
+      // Fallback
+      if (activeProductData.product_url) {
+        window.open(activeProductData.product_url, "_blank");
+      }
+    }
+  };
 
   const handleDescEnter = () => {
     if (galleryTimeoutRef.current) clearTimeout(galleryTimeoutRef.current);
@@ -316,11 +379,8 @@ export function UnifiedControlBar({
             >
               {/* Buy Now Button */}
               <motion.button
-                onClick={() => {
-                  if (activeProductData?.product_url) {
-                    window.open(activeProductData.product_url, "_blank");
-                  }
-                }}
+                onClick={handleBuyNowClick}
+                disabled={checkoutLoading}
                 style={{
                   background: "#000",
                   color: "#fff",
@@ -330,21 +390,22 @@ export function UnifiedControlBar({
                   height: "44px",
                   fontSize: "13px",
                   fontWeight: "600",
-                  cursor: "pointer",
+                  cursor: checkoutLoading ? "not-allowed" : "pointer",
                   display: "flex",
                   alignItems: "center",
                   gap: "6px",
                   whiteSpace: "nowrap",
+                  opacity: checkoutLoading ? 0.7 : 1
                 }}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={checkoutLoading ? {} : { scale: 1.03 }}
+                whileTap={checkoutLoading ? {} : { scale: 0.95 }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
                   <line x1="3" y1="6" x2="21" y2="6" />
                   <path d="M16 10a4 4 0 0 1-8 0" />
                 </svg>
-                Buy Now
+                {checkoutLoading ? "Redirecting..." : cmsConfig.buttons.buyNow}
               </motion.button>
 
               {/* Description Button */}
@@ -376,7 +437,7 @@ export function UnifiedControlBar({
                   <line x1="16" y1="13" x2="8" y2="13" />
                   <line x1="16" y1="17" x2="8" y2="17" />
                 </svg>
-                Description
+                {cmsConfig.buttons.description}
               </motion.button>
 
               {/* Gallery Button - only if there are gallery images */}
@@ -410,7 +471,7 @@ export function UnifiedControlBar({
                     <circle cx="8.5" cy="8.5" r="1.5" />
                     <polyline points="21 15 16 10 5 21" />
                   </svg>
-                  Gallery
+                  {cmsConfig.buttons.gallery}
                 </motion.button>
               )}
             </motion.div>

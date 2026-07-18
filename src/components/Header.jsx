@@ -16,8 +16,26 @@ export default function Header({
 }) {
   const [showCollections, setShowCollections] = useState(false);
   const [hoveredCollection, setHoveredCollection] = useState(null);
+  const [headerData, setHeaderData] = useState({
+    brandName: "MOROCCAN",
+    brandSuffix: "CRAFTS",
+    tagline: "Est. 2026",
+    quoteText: "HANDMADE"
+  });
   const dropdownRef = useRef(null);
   const timeoutRef = useRef(null);
+
+  // Load content configs
+  useEffect(() => {
+    fetch("/api/admin/content")
+      .then(res => res.json())
+      .then(data => {
+        if (data.header) {
+          setHeaderData(data.header);
+        }
+      })
+      .catch(err => console.error("CMS read error:", err));
+  }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -108,7 +126,7 @@ export default function Header({
                 textTransform: "uppercase",
               }}
             >
-              MOROCCAN
+              {headerData.brandName}
             </span>
             <span
               style={{
@@ -121,7 +139,7 @@ export default function Header({
                 textTransform: "uppercase",
               }}
             >
-              CRAFTS
+              {headerData.brandSuffix}
             </span>
           </div>
           <span
@@ -136,7 +154,7 @@ export default function Header({
               marginTop: "-1px",
             }}
           >
-            Est. 2026
+            {headerData.tagline}
           </span>
         </div>
       </div>
@@ -340,7 +358,7 @@ export default function Header({
 
         <NavItem label="CONTACT" number="02" onClick={onContactClick} />
         <Divider />
-        <QuoteText text="HANDMADE" />
+        <QuoteText text={headerData.quoteText} />
       </div>
 
       {/* Mobile responsive styles + scrollbar hide */}
