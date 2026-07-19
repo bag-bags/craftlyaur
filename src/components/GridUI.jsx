@@ -23,6 +23,7 @@ export function UnifiedControlBar({
   const [cmsConfig, setCmsConfig] = useState({
     buttons: {
       buyNow: "Buy Now",
+      wholesale: "Wholesale",
       description: "Description",
       gallery: "Gallery",
       contact: "Contact Us"
@@ -407,6 +408,40 @@ export function UnifiedControlBar({
                 </svg>
                 {checkoutLoading ? "Redirecting..." : cmsConfig.buttons.buyNow}
               </motion.button>
+
+              {/* Wholesale Button */}
+              {activeProductData?.product_url && (
+                <motion.button
+                  onClick={() => {
+                    window.open(activeProductData.product_url, "_blank");
+                  }}
+                  style={{
+                    background: "transparent",
+                    color: "#333",
+                    border: "1px solid rgba(0,0,0,0.08)",
+                    borderRadius: "24px",
+                    padding: "0 16px",
+                    height: "44px",
+                    fontSize: "13px",
+                    fontWeight: "500",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    whiteSpace: "nowrap",
+                    transition: "background 0.2s ease",
+                  }}
+                  whileHover={{ scale: 1.03, backgroundColor: "rgba(0,0,0,0.06)" }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                  {cmsConfig.buttons.wholesale || "Wholesale"}
+                </motion.button>
+              )}
 
               {/* Description Button */}
               <motion.button

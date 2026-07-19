@@ -6,7 +6,7 @@ export default function AdminContent() {
   const [loading, setLoading] = useState(true);
   const [content, setContent] = useState({
     header: { brandName: "", brandSuffix: "", tagline: "", quoteText: "" },
-    buttons: { buyNow: "", description: "", gallery: "", contact: "" },
+    buttons: { buyNow: "", wholesale: "", description: "", gallery: "", contact: "" },
     footer: { copyright: "", links: [] },
     stripe: { enabled: false, currency: "usd" }
   });
@@ -173,6 +173,10 @@ export default function AdminContent() {
               <div style={inputGroupStyle}>
                 <label style={labelStyle}>Buy Now Button Label</label>
                 <input type="text" value={content.buttons.buyNow} onChange={e => handleButtonsChange("buyNow", e.target.value)} style={inputStyle} />
+              </div>
+              <div style={inputGroupStyle}>
+                <label style={labelStyle}>Wholesale Button Label</label>
+                <input type="text" value={content.buttons.wholesale || ""} onChange={e => handleButtonsChange("wholesale", e.target.value)} style={inputStyle} />
               </div>
               <div style={inputGroupStyle}>
                 <label style={labelStyle}>Description Button Label</label>
